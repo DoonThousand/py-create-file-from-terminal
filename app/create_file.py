@@ -1,72 +1,45 @@
-import sys
 import os
-from datetime import datetime
+import sys
+import datetime
 
 
-def create_file(file_path: str) -> None:
-    os.makedirs(os.path.dirname(file_path) or ".", exist_ok=True)
-
-    file_exists = os.path.exists(file_path)
-
-    with open(file_path, "a", encoding="utf-8") as file:
-        if file_exists and os.path.getsize(file_path) > 0:
-            file.write("\n")
-
-        file.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
-
-        line_no = 1
-
+def create_file_from_terminal(file_name: str) -> None:
+    with open(file_name, "a") as f:
+        number_of_line = 1
+        f.write(datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
         while True:
-            try:
-                user_input = input("Enter content line: ")
-            except (EOFError, IndexError):
+            string_input = input("Enter content line: ")
+            if string_input == "stop":
                 break
-
-            if user_input.strip().lower() == "stop":
-                break
-
-            file.write(f"{line_no} {user_input}\n")
-            line_no += 1
+            else:
+                f.write(f"{number_of_line} {string_input}\n")
+                number_of_line += 1
 
 
-def find_path_from_terminal() -> None:
-    args = sys.argv[1:]
+def file_path_from_terminal() -> None:
 
-    dirs = []
-    filename = None
-    create_file_flag = False
+    terminal_content = sys.argv
 
-    i = 0
-    while i < len(args):
-        arg = args[i]
+    if "-d" in terminal_content:
+        d_index = sys.argv.index("-d")
 
-        if arg == "-d":
-            i += 1
-            while i < len(args) and not args[i].startswith("-"):
-                dirs.append(args[i])
-                i += 1
-            continue
+        if "-f" in terminal_content:
+            f_index = sys.argv.index("-f")
+            dir_path = terminal_content[d_index + 1:f_index]
+        else:
+            dir_path = terminal_content[d_index + 1:]
 
-        if arg == "-f":
-            if i + 1 < len(args) and not args[i + 1].startswith("-"):
-                filename = args[i + 1]
-                create_file_flag = True
-                i += 2
-                continue
-            i += 1
-            continue
-
-        i += 1
-
-    dir_path = os.path.join(*dirs) if dirs else ""
-
-    if dir_path:
+        dir_path = os.path.join(*dir_path)
         os.makedirs(dir_path, exist_ok=True)
 
-    if create_file_flag:
-        file_path = os.path.join(dir_path, filename) if dir_path else filename
-        create_file(file_path)
+    if "-f" in terminal_content:
+        file_name = terminal_content[terminal_content.index("-f") + 1]
+
+        if "-d" in terminal_content:
+            file_name = os.path.join(dir_path, file_name)
+
+        create_file_from_terminal(file_name)
 
 
 if __name__ == "__main__":
-    find_path_from_terminal()
+    file_path_from_terminal()
