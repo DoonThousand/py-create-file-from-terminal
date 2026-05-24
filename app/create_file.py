@@ -25,13 +25,11 @@ def write_to_file(file_path: str, lines: list[str]) -> None:
     for index, line in enumerate(lines, start=1):
         content += f"{index} {line}\n"
 
-    if os.path.exists(file_path):
-        with open(file_path, "a", encoding="utf-8") as file:
+    with open(file_path, "a", encoding="utf-8") as file:
+        if file.tell() > 0:
             file.write("\n")
-            file.write(content)
-    else:
-        with open(file_path, "w", encoding="utf-8") as file:
-            file.write(content)
+
+        file.write(content)
 
 
 def main() -> None:
@@ -71,4 +69,5 @@ def main() -> None:
         write_to_file(file_path, lines)
 
 
-main()
+if __name__ == "__main__":
+    main()
