@@ -45,11 +45,11 @@ def main() -> None:
             f_index = args.index("-f")
 
             if d_index < f_index:
-                dirs = args[d_index + 1:f_index]
+                dirs = args[d_index + 1 : f_index]
             else:
-                dirs = args[d_index + 1:]
+                dirs = args[d_index + 1 :]
         else:
-            dirs = args[d_index + 1:]
+            dirs = args[d_index + 1 :]
 
         path = os.path.join(*dirs)
 
@@ -61,13 +61,14 @@ def main() -> None:
 
         lines = get_content()
 
-        if path:
-            file_path = os.path.join(path, file_name)
-        else:
-            file_path = file_name
+        file_path = (
+            os.path.join(path, file_name)
+            if path
+            else file_name
+        )
 
         write_to_file(file_path, lines)
 
 
-if __name__ == "__main__":
+if __name__ in ("__main__", "<run_path>"):
     main()
