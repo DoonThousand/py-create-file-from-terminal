@@ -12,40 +12,46 @@ def create_file(file_path: str) -> None:
 
         file.write(datetime.now().strftime("%Y-%m-%d %H:%M:%S") + "\n")
 
-        number_of_line = 1
+        line_no = 1
 
         while True:
-            input_line = input("Enter content line: ")
+            user_input = input("Enter content line: ")
 
-            if input_line.lower() == "stop":
+            if user_input.strip().lower() == "stop":
                 break
 
-            file.write(f"{number_of_line} {input_line}\n")
-            number_of_line += 1
+            file.write(f"{line_no} {user_input}\n")
+            line_no += 1
 
 
 def find_path_from_terminal() -> None:
     args = sys.argv[1:]
+
     dirs = []
     filename = "file.txt"
 
     i = 0
     while i < len(args):
-        if args[i] == "-d":
+        arg = args[i]
+
+        if arg == "-d":
             i += 1
             while i < len(args) and not args[i].startswith("-"):
                 dirs.append(args[i])
                 i += 1
             continue
 
-        if args[i] == "-f":
-            if i + 1 < len(args):
-                filename = args[i + 1]
-            i += 2
+        elif arg == "-f":
+            i += 1
+            if i < len(args) and not args[i].startswith("-"):
+                filename = args[i]
+                i += 1
             continue
 
-        i += 1
+        else:
+            i += 1
 
+    # Build directory path safely
     dir_path = os.path.join(*dirs) if dirs else ""
 
     if dir_path:
@@ -53,6 +59,7 @@ def find_path_from_terminal() -> None:
 
     file_path = os.path.join(dir_path, filename) if dir_path else filename
 
+    # Always reach execution step
     create_file(file_path)
 
 
