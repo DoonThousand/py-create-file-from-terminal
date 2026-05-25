@@ -4,7 +4,7 @@ from datetime import datetime
 
 
 def get_content() -> list[str]:
-    lines = []
+    content_lines = []
 
     while True:
         line = input("Enter content line: ")
@@ -12,62 +12,63 @@ def get_content() -> list[str]:
         if line == "stop":
             break
 
-        lines.append(line)
+        content_lines.append(line)
 
-    return lines
+    return content_lines
 
 
-def write_to_file(file_path: str, lines: list[str]) -> None:
+def write_to_file(file_path: str, content_lines: list[str]) -> None:
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    content = f"{timestamp}\n"
+    numbered_lines = []
 
-    for index, line in enumerate(lines, start=1):
-        content += f"{index} {line}\n"
+    for index, line in enumerate(content_lines, start=1):
+        numbered_lines.append(f"{index} {line}")
 
-    with open(file_path, "a", encoding="utf-8") as file:
-        if file.tell() > 0:
-            file.write("\n")
+    content = f"{timestamp}\n" + "\n".join(numbered_lines) + "\n"
 
-        file.write(content)
+    with open(file_path, "a", encoding="utf-8") as source_file:
+        if source_file.tell() > 0:
+            source_file.write("\n")
+
+        source_file.write(content)
 
 
 def main() -> None:
-    args = sys.argv[1:]
+    cli_args = sys.argv[1:]
 
     path = ""
     file_name = ""
 
-    if "-d" in args:
-        d_index = args.index("-d")
+    if "-d" in cli_args:
+        d_index = cli_args.index("-d")
 
-        if "-f" in args:
-            f_index = args.index("-f")
+        if "-f" in cli_args:
+            f_index = cli_args.index("-f")
 
             if d_index < f_index:
-                dirs = args[d_index + 1 : f_index]
+                dirs = cli_args[d_index + 1 : f_index]
             else:
-                dirs = args[d_index + 1 :]
+                dirs = cli_args[d_index + 1 :]
         else:
-            dirs = args[d_index + 1 :]
+            dirs = cli_args[d_index + 1 :]
 
         path = os.path.join(*dirs)
 
         os.makedirs(path, exist_ok=True)
 
-    if "-f" in args:
-        f_index = args.index("-f")
-        file_name = args[f_index + 1]
+    if "-f" in cli_args:
+        f_index = cli_args.index("-f")
+        file_name = cli_args[f_index + 1]
 
-        lines = get_content()
+        content_lines = get_content()
 
-        file_path = (
-            os.path.join(path, file_name)
-            if path
-            else file_name
-        )
+        if path:
+            file_path = os.path.join(path, file_name)
+        else:
+            file_path = file_name
 
-        write_to_file(file_path, lines)
+        write_to_file(file_path, content_lines)
 
 
 if __name__ in ("__main__", "<run_path>"):
